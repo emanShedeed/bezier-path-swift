@@ -1,0 +1,85 @@
+//: A UIKit based Playground for presenting user interface
+  
+import UIKit
+import PlaygroundSupport
+
+@IBDesignable
+final class Card: UIView {
+    
+    private let shapeLayer: CAShapeLayer = .init()
+    @IBInspectable
+    var gapSize: CGSize = .init(width: 100, height: 100)
+    @IBInspectable
+    var cornerRadius: CGFloat = 50
+    
+    override func draw(_ rect: CGRect) {
+        super.draw(rect)
+        
+        let halfOfGapWidth: CGFloat = gapSize.width / 2
+        // let gapCenter: CGFloat = ((bounds.size.width / 2) - halfOfGapWidth)
+        // let gapPosition: CGPoint = .init(x: gapCenter, y: .zero)
+        let gapThreshold: CGFloat = (bounds.size.width / 2) - halfOfGapWidth
+        
+        print(gapThreshold, bounds.size.width)
+        
+        self.shapeLayer.fillColor = UIColor.red.cgColor
+        self.shapeLayer.fillRule = .nonZero
+        shapeLayer.frame = self.bounds
+        
+        let path = UIBezierPath(
+            // roundedRect: shapeLayer.bounds,
+            // byRoundingCorners: [.topLeft, .topRight],
+            // cornerRadii: .init(width: cornerRadius, height: cornerRadius)
+        )
+        
+        path.move(to: .zero)
+        path.addLine(to: .init(x: gapThreshold, y: .zero))
+//        path.addArc(
+//            withCenter: gapPosition,
+//            radius: gapSize.height / 2,
+//            startAngle: 0,
+//            endAngle: .pi,
+//            clockwise: true
+//        )
+        path.addLine(to: .init(x: gapThreshold, y: gapSize.height))
+        path.addLine(to: .init(x: gapThreshold + gapSize.width, y: gapSize.height))
+        // corner
+        path.addLine(to: .init(x: gapThreshold + gapSize.width, y: gapSize.height))
+        // corner
+        path.addLine(to: .init(x: gapThreshold + gapSize.width, y: .zero))
+        path.addLine(to: .init(x: bounds.size.width, y: .zero))
+        path.addLine(to: .init(x: bounds.size.width, y: bounds.size.height))
+        path.addLine(to: .init(x: .zero, y: bounds.size.height))
+        path.close()
+                
+        self.shapeLayer.path = path.cgPath
+        
+        self.layer.mask = shapeLayer
+        self.layer.cornerRadius = cornerRadius
+        self.layer.maskedCorners = [.layerMaxXMinYCorner, .layerMinXMinYCorner]
+        self.layer.masksToBounds = true
+    }
+    
+}
+
+
+
+let card: Card = .init(
+    frame: .init(
+        origin: .init(
+            x: 100,
+            y: 100
+        ),
+        size: .init(
+            width: 300,
+            height: 400
+        )
+    )
+)
+card.backgroundColor = .systemBlue
+
+let container: UIView = .init(frame: .init(origin: .zero, size: .init(width: 500, height: 600)))
+container.backgroundColor = .systemPurple
+container.addSubview(card)
+
+PlaygroundPage.current.liveView = container
